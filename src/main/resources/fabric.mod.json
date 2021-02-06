@@ -3,11 +3,14 @@
   "id": "girc",
   "version": "${version}",
   "name": "girc",
-  "description": "",
+  "description": "Simple IRC client for minecraft",
   "authors": ["Luis Michaelis"],
-  "contact": {},
+  "contact": {
+    "sources": "https://github.com/lmichaelis/girc",
+    "issues": "https://github.com/lmichaelis/girc/issues",
+    "email": "private@lmichaelis.de"
+  },
   "license": "MIT",
-  "icon": "assets/girc/icon.png",
   "environment": "client",
   "entrypoints": {
     "client": [
