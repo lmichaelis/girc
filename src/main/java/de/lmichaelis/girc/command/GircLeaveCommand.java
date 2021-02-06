@@ -26,6 +26,6 @@ public class GircLeaveCommand {
                         .append(new LiteralText(name).formatted(Formatting.RED))
         );
 
-        GircSwitchCommand.switchChannel(GircClient.IRC_CLIENT.getChannels().stream().findFirst().get().getName());
+        GircSwitchCommand.switchChannel(GircClient.ircClient.getChannels().stream().findFirst().get().getName());
     }
 }

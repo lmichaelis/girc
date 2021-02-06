@@ -16,11 +16,11 @@ public class GircToggleChatCommand {
     }
 
     private static void toggle() {
-        GircClient.CHAT_TOGGLED = !GircClient.CHAT_TOGGLED;
+        GircClient.chatToggled = !GircClient.chatToggled;
 
         GircClient.sendMessage(
                 new LiteralText(" All messages are sent to ")
-                        .append(new LiteralText(GircClient.CHAT_TOGGLED ? "the IRC server" : "Minecraft chat").formatted(Formatting.GREEN))
+                        .append(new LiteralText(GircClient.chatToggled ? "the IRC server" : "Minecraft chat").formatted(Formatting.GREEN))
                         .append(".")
         );
     }

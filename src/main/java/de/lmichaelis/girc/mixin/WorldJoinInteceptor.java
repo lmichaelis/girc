@@ -14,10 +14,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class WorldJoinInteceptor {
     @Inject(at = @At("TAIL"), method = "onGameJoin")
     public void onGameJoin(GameJoinS2CPacket packet, CallbackInfo ci) {
-        if (GircClient.CURRENT_CHANNEL != null) {
+        if (GircClient.currentChannel != null) {
             GircClient.sendMessage(
                     new LiteralText(" You are talking in ")
-                            .append(new LiteralText(GircClient.CURRENT_CHANNEL).formatted(Formatting.RED))
+                            .append(new LiteralText(GircClient.currentChannel).formatted(Formatting.RED))
             );
         }
     }

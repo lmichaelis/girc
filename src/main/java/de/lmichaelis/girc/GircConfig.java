@@ -5,7 +5,6 @@ import com.google.gson.annotations.SerializedName;
 import me.shedaniel.clothconfig2.api.ConfigBuilder;
 import me.shedaniel.clothconfig2.api.ConfigCategory;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
@@ -37,9 +36,6 @@ public class GircConfig {
     @SerializedName("defaultChannel")
     public String defaultChannel = "";
 
-    @SerializedName("nick")
-    public String nickname = MinecraftClient.getInstance().getSession().getUsername();
-
     @SerializedName("fingerprint")
     public String sha1Fingeprint = "";
 
@@ -58,7 +54,9 @@ public class GircConfig {
         try (FileWriter fr = new FileWriter(PATH)) {
             GSON.toJson(this, fr);
 
-            GircClient.IRC_CLIENT.shutdown();
+            GircClient.ircClient.shutdown();
+            GircClient.connected = false;
+
             GircClient.ircConnect();
         } catch (IOException e) {
             e.printStackTrace();
@@ -104,13 +102,6 @@ public class GircConfig {
                 .setTooltip(Text.of("The default channel to send messages to"))
                 .setSaveConsumer(newDefault -> defaultChannel = newDefault)
                 .setDefaultValue("")
-                .build());
-
-        general.addEntry(builder.entryBuilder()
-                .startStrField(Text.of("Nickname"), nickname)
-                .setTooltip(Text.of("Your nickname on the IRC server"))
-                .setSaveConsumer(newNick -> nickname = newNick)
-                .setDefaultValue(MinecraftClient.getInstance().getSession().getUsername())
                 .build());
 
         general.addEntry(builder.entryBuilder()

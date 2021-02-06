@@ -6,24 +6,23 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.toast.SystemToast;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import org.kitteh.irc.client.library.Client;
 import org.kitteh.irc.client.library.event.channel.ChannelMessageEvent;
 
-import javax.net.ssl.CertPathTrustManagerParameters;
-import javax.net.ssl.ManagerFactoryParameters;
 import javax.net.ssl.TrustManagerFactory;
-import javax.net.ssl.X509TrustManager;
-import java.security.KeyStore;
 
 @Environment(EnvType.CLIENT)
 public class GircClient implements ClientModInitializer {
-    public static Client IRC_CLIENT;
-    public static String CURRENT_CHANNEL;
-    public static boolean CHAT_TOGGLED = false;
-    public static GircConfig CONFIG;
+    public static Client ircClient;
+    public static String currentChannel;
+    public static boolean chatToggled = false;
+    public static boolean errorSent = false;
+    public static boolean connected = false;
+    public static GircConfig config;
 
 
     public static void sendMessage(Text text) {
@@ -40,31 +39,46 @@ public class GircClient implements ClientModInitializer {
         try {
             TrustManagerFactory f = null;
 
-            if (!CONFIG.sha1Fingeprint.isEmpty()) {
-                f = new FingerprintTrustManagerFactory(CONFIG.sha1Fingeprint);
+            if (!config.sha1Fingeprint.isEmpty()) {
+                f = new FingerprintTrustManagerFactory(config.sha1Fingeprint);
             }
 
-            IRC_CLIENT = Client.builder()
-                    .nick(CONFIG.nickname)
+            ircClient = Client.builder()
+                    .nick(MinecraftClient.getInstance().getSession().getUsername())
                     .server()
-                    .host(CONFIG.server)
-                    .password(CONFIG.serverPassword.isEmpty() ? null : CONFIG.serverPassword)
+                    .host(config.server)
+                    .password(config.serverPassword.isEmpty() ? null : config.serverPassword)
                     .port(
-                            CONFIG.serverPort,
-                            CONFIG.tls ? Client.Builder.Server.SecurityType.SECURE : Client.Builder.Server.SecurityType.INSECURE
+                            config.serverPort,
+                            config.tls ? Client.Builder.Server.SecurityType.SECURE : Client.Builder.Server.SecurityType.INSECURE
                     )
                     .secureTrustManagerFactory(f)
                     .then()
-                    .buildAndConnect();
+                    .build();
 
-            IRC_CLIENT.getEventManager().registerEventListener(new IrcEventListener());
+            ircClient.getEventManager().registerEventListener(new IrcEventListener());
+            ircClient.setExceptionListener(e -> {
+                MinecraftClient.getInstance().getToastManager().add(
+                        new SystemToast(
+                                SystemToast.Type.NARRATOR_TOGGLE,
+                                Text.of("IRC Connection failed!"),
+                                Text.of("Nothing to add :D")
+                        )
+                );
 
-            for (String chan : CONFIG.channels) {
-                IRC_CLIENT.addChannel(chan);
+                errorSent = true;
+                connected = false;
+            });
+
+            ircClient.connect();
+            errorSent = false;
+            connected = true;
+            for (String chan : config.channels) {
+                ircClient.addChannel(chan);
             }
 
-            if (!CONFIG.defaultChannel.isEmpty()) {
-                CURRENT_CHANNEL = CONFIG.defaultChannel;
+            if (!config.defaultChannel.isEmpty()) {
+                currentChannel = config.defaultChannel;
             }
         } catch (Exception e) {
             System.err.println("Error: " + e.getMessage());
@@ -72,20 +86,25 @@ public class GircClient implements ClientModInitializer {
     }
 
     public static void addChannel(String channel) {
-        IRC_CLIENT.addChannel(channel);
-        CONFIG.channels.add(channel);
-        CONFIG.save();
+        ircClient.addChannel(channel);
+
+        if (currentChannel == null) {
+            config.defaultChannel = channel;
+        }
+
+        config.channels.add(channel);
+        config.save();
     }
 
     public static void removeChannel(String channel) {
-        IRC_CLIENT.removeChannel(channel);
-        CONFIG.channels.remove(channel);
-        CONFIG.save();
+        ircClient.removeChannel(channel);
+        config.channels.remove(channel);
+        config.save();
     }
 
     @Override
     public void onInitializeClient() {
-        CONFIG = GircConfig.load();
+        config = GircConfig.load();
         ircConnect();
     }
 

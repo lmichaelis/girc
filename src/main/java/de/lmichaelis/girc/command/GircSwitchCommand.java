@@ -1,7 +1,6 @@
 package de.lmichaelis.girc.command;
 
 import com.mojang.brigadier.CommandDispatcher;
-import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import de.lmichaelis.girc.GircClient;
 import de.lmichaelis.girc.command.type.GircChannelArgumentType;
 import io.github.cottonmc.clientcommands.ArgumentBuilders;
@@ -27,7 +26,7 @@ public class GircSwitchCommand {
     }
 
     public static void switchChannel(String newChannel) {
-        GircClient.CURRENT_CHANNEL = newChannel;
+        GircClient.currentChannel = newChannel;
 
         GircClient.sendMessage(
                 new LiteralText(" Switched to ")

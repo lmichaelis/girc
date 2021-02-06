@@ -6,6 +6,6 @@ import io.github.prospector.modmenu.api.ModMenuApi;
 public class GircModMenuIntegration implements ModMenuApi {
     @Override
     public ConfigScreenFactory<?> getModConfigScreenFactory() {
-        return parent -> GircClient.CONFIG.buildConfigScreen(parent);
+        return parent -> GircClient.config.buildConfigScreen(parent);
     }
 }

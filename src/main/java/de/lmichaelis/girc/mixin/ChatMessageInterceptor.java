@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class ChatMessageInterceptor {
     @Inject(at = @At("HEAD"), method = "sendChatMessage", cancellable = true)
     public void sendChatMessage(String message, CallbackInfo ci)  {
-        if (GircClient.CHAT_TOGGLED) {
+        if (GircClient.chatToggled) {
             GircMessageCommand.sendMessage(message);
             ci.cancel();
         }
