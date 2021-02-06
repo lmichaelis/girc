@@ -1,0 +1,15 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "de.lmichaelis.girc.mixin",
+  "compatibilityLevel": "JAVA_8",
+  "mixins": [
+    "ChatMessageInterceptor",
+    "WorldJoinInteceptor"
+  ],
+  "client": [
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
