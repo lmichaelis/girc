@@ -54,7 +54,10 @@ public class GircConfig {
         try (FileWriter fr = new FileWriter(PATH)) {
             GSON.toJson(this, fr);
 
-            GircClient.ircClient.shutdown();
+            if (GircClient.ircClient != null) {
+                GircClient.ircClient.shutdown();
+            }
+
             GircClient.connected = false;
             GircClient.ircClient = null;
 
