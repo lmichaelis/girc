@@ -56,6 +56,7 @@ public class GircConfig {
 
             GircClient.ircClient.shutdown();
             GircClient.connected = false;
+            GircClient.ircClient = null;
 
             GircClient.ircConnect();
         } catch (IOException e) {

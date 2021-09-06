@@ -12,12 +12,15 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import org.kitteh.irc.client.library.Client;
 import org.kitteh.irc.client.library.event.channel.ChannelMessageEvent;
+import org.kitteh.irc.client.library.event.connection.ClientConnectionEstablishedEvent;
+import org.kitteh.irc.client.library.event.connection.ClientConnectionFailedEvent;
+import org.kitteh.irc.client.library.event.helper.ConnectionEvent;
 
 import javax.net.ssl.TrustManagerFactory;
 
 @Environment(EnvType.CLIENT)
 public class GircClient implements ClientModInitializer {
-    public static Client ircClient;
+    public static Client ircClient = null;
     public static String currentChannel;
     public static boolean chatToggled = false;
     public static boolean errorSent = false;
@@ -33,9 +36,14 @@ public class GircClient implements ClientModInitializer {
                         .append(text),
                 false
         );
+
     }
 
     public static void ircConnect() {
+        if (ircClient != null) {
+            return;
+        }
+
         try {
             TrustManagerFactory f = null;
 
@@ -57,22 +65,8 @@ public class GircClient implements ClientModInitializer {
                     .build();
 
             ircClient.getEventManager().registerEventListener(new IrcEventListener());
-            ircClient.setExceptionListener(e -> {
-                MinecraftClient.getInstance().getToastManager().add(
-                        new SystemToast(
-                                SystemToast.Type.NARRATOR_TOGGLE,
-                                Text.of("IRC Connection failed!"),
-                                Text.of("Nothing to add :D")
-                        )
-                );
-
-                errorSent = true;
-                connected = false;
-            });
-
             ircClient.connect();
-            errorSent = false;
-            connected = true;
+
             for (String chan : config.channels) {
                 ircClient.addChannel(chan);
             }
@@ -105,10 +99,42 @@ public class GircClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         config = GircConfig.load();
-        ircConnect();
+    }
+
+    public static void notifyError() {
+        if (!errorSent) {
+            MinecraftClient.getInstance().getToastManager().add(
+                    new SystemToast(
+                            SystemToast.Type.NARRATOR_TOGGLE,
+                            Text.of("IRC connection failed!"),
+                            Text.of("Connection was closed.")
+                    )
+            );
+        }
+        errorSent = true;
     }
 
     public static class IrcEventListener {
+        @Handler
+        public void onConnect(ClientConnectionEstablishedEvent event) {
+            MinecraftClient.getInstance().getToastManager().add(
+                    new SystemToast(
+                            SystemToast.Type.NARRATOR_TOGGLE,
+                            Text.of("IRC Connected."),
+                            Text.of("Fun chatting!")
+                    )
+            );
+
+            connected = true;
+            errorSent = false;
+        }
+
+        @Handler
+        public void onConnectFailed(ClientConnectionFailedEvent event) {
+            connected = false;
+            notifyError();
+        }
+
         @Handler
         public void onChannelMessage(ChannelMessageEvent event) {
             if (MinecraftClient.getInstance().player == null) {

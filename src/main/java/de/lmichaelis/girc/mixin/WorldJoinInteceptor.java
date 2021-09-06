@@ -14,6 +14,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class WorldJoinInteceptor {
     @Inject(at = @At("TAIL"), method = "onGameJoin")
     public void onGameJoin(GameJoinS2CPacket packet, CallbackInfo ci) {
+        GircClient.ircConnect();
+
         if (GircClient.currentChannel != null) {
             GircClient.sendMessage(
                     new LiteralText(" You are talking in ")
