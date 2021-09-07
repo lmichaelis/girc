@@ -146,6 +146,7 @@ public class GircClient implements ClientModInitializer {
                     new LiteralText("[")
                             .append(new LiteralText(event.getChannel().getName()).formatted(Formatting.RED))
                             .append("] ")
+                            .append(event.getActor().getNick())
                             .append(new LiteralText(" » ").formatted(Formatting.GRAY))
                             .append(event.getMessage()),
                     false
