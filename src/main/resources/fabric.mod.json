@@ -8,7 +8,7 @@
   "contact": {
     "sources": "https://github.com/lmichaelis/girc",
     "issues": "https://github.com/lmichaelis/girc/issues",
-    "email": "private@lmichaelis.de"
+    "email": "lmichaelis.all+dev@gmail.com"
   },
   "license": "MIT",
   "environment": "client",
@@ -30,8 +30,8 @@
   "depends": {
     "fabricloader": ">=0.10",
     "fabric": "*",
-    "minecraft": ">=1.16.3",
-    "cloth-config2": ">=4.8",
-    "modmenu": ">=1.14"
+    "minecraft": ">=1.17",
+    "cloth-config2": ">=5.0",
+    "modmenu": ">=2.0"
   }
 }
